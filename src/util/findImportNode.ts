@@ -1,6 +1,6 @@
 import { TSESTree, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
 
-export function findImportNode(node: TSESTree.Node, constructName?: string, libraryName?: string): boolean {
+export function findImportNode(node: TSESTree.Node, constructName?: string, hasLibrary?: boolean, libraryName?: string): boolean {
   let root = false;
   let n = node;
   if (!n.parent) {
@@ -16,14 +16,14 @@ export function findImportNode(node: TSESTree.Node, constructName?: string, libr
             let spec = body.specifiers[s] as TSESTree.ImportSpecifier;
             switch (body.source.value) {
               case 'monocdk':
-              case '@aws-cdk/aws-s3':
-              case 'monocdk/aws-s3':
+              case `@aws-cdk/aws-${libraryName}`:
+              case `monocdk/aws-${libraryName}`:
                 // e.g. import * as s3 from '@aws-cdk/aws-s3';
                 // e.g. import { aws_s3 as s3 } from 'monocdk';
-                if (libraryName && spec.local.name === libraryName) {
+                if (hasLibrary && spec.local.name === libraryName) {
                   return true;
                   // e.g. import { Bucket } from '@aws-cdk/aws-s3';
-                } else if (!libraryName && spec.local.name === constructName) {
+                } else if (!hasLibrary && spec.local.name === constructName) {
                   return true;
                 }
                 break;

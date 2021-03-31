@@ -33,7 +33,7 @@ export function getCdkExpression(
   if (callee.type === AST_NODE_TYPES.Identifier) {
     let c = callee as TSESTree.Identifier;
     if (c.name === params.construct) {
-      proceed = findImportNode(params.node, params.construct);
+      proceed = findImportNode(params.node, params.construct, false, params.library);
     }
     // type will be MemberExpression when doing 'new s3.Bucket()'
     /**
@@ -57,7 +57,7 @@ export function getCdkExpression(
       let object = c.object as TSESTree.Identifier;
       let property = c.property as TSESTree.Identifier;
       if (object.name === params.library && property.name === params.construct) {
-        proceed = findImportNode(params.node, params.construct, params.library);
+        proceed = findImportNode(params.node, params.construct, true, params.library);
       }
     }
   }
@@ -71,21 +71,29 @@ export function getCdkExpression(
         for (let p = 0; p < a.properties.length; p++) {
           let pr = a.properties[p] as TSESTree.Property;
           if (pr.key.type === AST_NODE_TYPES.Identifier && pr.key.name === params.propertyKey) {
-            if (pr.value.type === AST_NODE_TYPES.MemberExpression) {
-              let value = pr.value.property as TSESTree.Identifier;
-              return {
-                objectExpression: a,
-                propertyValue: value.name,
-                propertyLoc: value.loc,
-                propertyRange: value.range,
-              };
-            } else if (pr.value.type === AST_NODE_TYPES.Literal) {
-              return {
-                objectExpression: a,
-                propertyValue: pr.value.value,
-                propertyLoc: pr.value.loc,
-                propertyRange: pr.value.range,
-              };
+            switch (pr.value.type) {
+              case AST_NODE_TYPES.MemberExpression:
+                let value = pr.value.property as TSESTree.Identifier;
+                return {
+                  objectExpression: a,
+                  propertyValue: value.name,
+                  propertyLoc: value.loc,
+                  propertyRange: value.range,
+                };
+              case AST_NODE_TYPES.Literal:
+                return {
+                  objectExpression: a,
+                  propertyValue: pr.value.value,
+                  propertyLoc: pr.value.loc,
+                  propertyRange: pr.value.range,
+                };
+              case AST_NODE_TYPES.ArrayExpression:
+                return {
+                  objectExpression: a,
+                  propertyValue: pr.value.elements,
+                  propertyLoc: pr.value.loc,
+                  propertyRange: pr.value.range,
+                };
             }
           }
         }
