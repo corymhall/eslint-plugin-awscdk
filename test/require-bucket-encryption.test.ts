@@ -199,5 +199,18 @@ new Bucket(this, 'TestBucket', {
       ],
       output: null,
     },
+    {
+      code: `
+import { Bucket } from 'monocdk/aws-s3';
+
+new Bucket(this, 'TestBucket');
+`,
+      errors: [
+        {
+          messageId: 'missingEncryption',
+        },
+      ],
+      output: null,
+    },
   ],
 });
