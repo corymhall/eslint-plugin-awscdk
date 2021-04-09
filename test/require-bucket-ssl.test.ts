@@ -86,5 +86,19 @@ new s3.Bucket(this, 'StorageBucket', {
       ],
       output: null,
     },
+    {
+      code: `
+import * as cdk from 'monocdk';
+import * as s3 from 'monocdk/aws-s3';
+
+new s3.Bucket(this, 'StorageBucket');
+`,
+      errors: [
+        {
+          messageId: 'requireSSL',
+        },
+      ],
+      output: null,
+    },
   ],
 });

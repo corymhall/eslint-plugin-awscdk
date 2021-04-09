@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESTree, TSESLint, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -39,23 +39,31 @@ export default createRule<Options, MessageIds>({
           propertyKey: 'encryption',
         });
         if (cdkObject && !cdkObject?.propertyValue) {
-          objectRange = cdkObject?.objectExpression.range;
-          context.report({
-            node,
-            messageId: 'missingEncryption',
-            suggest: [
-              {
-                messageId: 'enableKmsManagedEncryption',
-                fix: (fixer: TSESLint.RuleFixer) => {
-                  const fixes: TSESLint.RuleFix[] = [
-                    fixer.insertTextAfterRange([objectRange[0], objectRange[0] + 6], 'encryption: s3.BucketEncryption.KMS_MANAGED,\n    '),
-                  ];
-                  return fixes;
-                },
+          let o = cdkObject.objectExpression as TSESTree.Node;
+          if (o.type === AST_NODE_TYPES.NewExpression) {
+            context.report({
+              node,
+              messageId: 'missingEncryption',
+            });
+          } else {
+            objectRange = cdkObject?.objectExpression.range;
+            context.report({
+              node,
+              messageId: 'missingEncryption',
+              suggest: [
+                {
+                  messageId: 'enableKmsManagedEncryption',
+                  fix: (fixer: TSESLint.RuleFixer) => {
+                    const fixes: TSESLint.RuleFix[] = [
+                      fixer.insertTextAfterRange([objectRange[0], objectRange[0] + 6], 'encryption: s3.BucketEncryption.KMS_MANAGED,\n    '),
+                    ];
+                    return fixes;
+                  },
 
-              },
-            ],
-          });
+                },
+              ],
+            });
+          }
         } else {
           return;
         }

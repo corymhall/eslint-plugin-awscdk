@@ -30,6 +30,14 @@ new s3.Bucket(this, 'TestBucket', {
     },
     {
       code: `
+import * as s3 from '@aws-cdk/aws-s3';
+import { aws_s3 as s3 } from 'monocdk/aws-s3';
+
+new s3.Bucket(this, 'TestBucket');
+`,
+    },
+    {
+      code: `
 import { Bucket } from '@aws-cdk/aws-s3';
 
 new Bucket(this, 'TestBucket', {
