@@ -65,9 +65,11 @@ export function getCdkExpression(
   // if there is a new Bucket expression that is from the core 'aws-s3' library
   if (proceed) {
     // looking for a particular property, e.g. 'encryption' and returns information about that Node
+    let hasObjectExpression = false;
     for (let i = 0; i < params.node.arguments.length; i++) {
       let a = params.node.arguments[i];
       if (a.type === AST_NODE_TYPES.ObjectExpression) {
+        hasObjectExpression = true;
         for (let p = 0; p < a.properties.length; p++) {
           let pr = a.properties[p] as TSESTree.Property;
           if (pr.key.type === AST_NODE_TYPES.Identifier && pr.key.name === params.propertyKey) {
@@ -94,6 +96,13 @@ export function getCdkExpression(
                   propertyLoc: pr.value.loc,
                   propertyRange: pr.value.range,
                 };
+              case AST_NODE_TYPES.Identifier:
+                return {
+                  objectExpression: a,
+                  propertyValue: pr.value.name,
+                  propertyLoc: pr.value.loc,
+                  propertyRange: pr.value.range,
+                };
             }
           }
         }
@@ -101,6 +110,11 @@ export function getCdkExpression(
           objectExpression: a,
         };
       }
+    }
+    if (!hasObjectExpression) {
+      return {
+        objectExpression: params.node,
+      };
     }
 
   }
