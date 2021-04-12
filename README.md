@@ -11,17 +11,87 @@
 
 - [CloudFront.1 CloudFront distributions should have a default root object configured](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-cloudfront-1)
 
+*How to enable*
+```ts
+new Distribution(this, 'Distribution', {
+  defaultBehavior: {
+    ...
+  },
+  defaultRootObject: 'index.html',
+})
+```
+
 - [CloudFront.2 CloudFront distributions should have origin access identity enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-cloudfront-2)
 
 - [CloudFront.3 CloudFront distributions should require encryption in transit](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-cloudfront-3)
 
+*How to enable*
+```ts
+new Distribution(this, 'Distribution', {
+  defaultBehavior: {
+    viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    ...
+  },
+})
+
+// or
+
+new Distribution(this, 'Distribution', {
+  defaultBehavior: {
+    viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.HTTPS_ONLY,
+    ...
+  },
+})
+```
+
 - [CloudFront.4 CloudFront distributions should have origin failover configured](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-cloudfront-4)
+
+*How to enable*
+
+```ts
+new Distribution(this, 'Distribution', {
+  defaultBehavior: {
+    origin: new origins.OriginGroup(...),
+  }
+})
+```
 
 - [DMS.1 Database Migration Service replication instances should not be public](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dms-1)
 
 - [DynamoDB.1 DynamoDB tables should automatically scale capacity with demand](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-1)
 
+*How to enable*
+
+```ts
+// either set billingMode to PAY_PER_REQUEST
+
+new Table(this, 'Table', {
+  billingMode: BillingMode.PAY_PER_REQUEST,
+});
+
+new Table(this, 'Table', {
+  replicationRegions: ['us-east-1', 'us-east-2'], // if replication regions is specified then billingMode is set to PAY_PER_REQUEST
+})
+
+// or if billingMode is PROVISIONED, then enable autoscaling
+
+const table = new Table(this, 'Table', {
+  billingMode: BillingMode.PROVISIONED, // this is also the default
+});
+
+table.autoScaleReadCapacity();
+table.autoScaleWriteCapacity();
+```
+
 - [DynamoDB.2 DynamoDB tables should have point-in-time recovery enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-2)
+
+*How to enable*
+
+```ts
+new Table(this, 'Table', {
+  pointInTimeRecovery: true,
+})
+```
 
 - [DynamoDB.3 DynamoDB Accelerator (DAX) clusters should be encrypted at rest](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-3)
 
@@ -31,9 +101,38 @@
 
 - [ELB.4 Application load balancers should be configured to drop HTTP headers](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-elb-4)
 
+*How to enable*
+```ts
+const alb = new ApplicationLoadBalancer(this, 'ALB', {
+  ...
+})
+
+alb.setAttribute('routing.http.drop_invalid_header_fields.enabled', true);
+```
+
 - [ELB.5 Application and Classic Load Balancers logging should be enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-elb-5)
 
+*How to enable*
+
+```ts
+const alb = new ApplicationLoadBalancer(this, 'ALB', {
+  ...
+})
+
+alb.logAccessLogs(bucket);
+```
+
 - [ELB.6 Application Load Balancer deletion protection should be enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-elb-6)
+
+*How to enable*
+
+```ts
+new ApplicationLoadBalancer(this, 'ALB', {
+  deletionProtection: true,
+  ...
+})
+
+```
 
 - [ELBv2.1 Application Load Balancer should be configured to redirect all HTTP requests to HTTPS](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-elbv2-1)
 
