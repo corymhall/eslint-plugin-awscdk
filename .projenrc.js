@@ -119,4 +119,6 @@ const project = new TypeScriptAppProject({
   // typescriptVersion: 'latest',                                              /* TypeScript version to use. */
 });
 
+project.tsconfig.compilerOptions.esModuleInterop = true;
+
 project.synth();
