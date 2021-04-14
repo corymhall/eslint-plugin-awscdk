@@ -23,6 +23,12 @@ const project = new TypeScriptAppProject({
     'eslint',
   ],
 
+  tsconfig: {
+    compilerOptions: {
+      esModuleInterop: true,
+    },
+  },
+
   /* NodePackageOptions */
   // allowLibraryDependencies: true,                                           /* Allow the project to include `peerDependencies` and `bundledDependencies`. */
   // authorEmail: undefined,                                                   /* Author's e-mail. */
@@ -118,7 +124,5 @@ const project = new TypeScriptAppProject({
   // tsconfig: undefined,                                                      /* Custom TSConfig. */
   // typescriptVersion: 'latest',                                              /* TypeScript version to use. */
 });
-
-project.tsconfig.compilerOptions.esModuleInterop = true;
 
 project.synth();
