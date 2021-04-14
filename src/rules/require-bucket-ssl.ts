@@ -37,7 +37,7 @@ export default createRule<Options, MessageIds>({
           node: node,
           propertyKey: 'requireSSL',
         });
-        if (cdkObject?.propertyValue === undefined) {
+        if (cdkObject && cdkObject.propertyValue === undefined) {
           objectRange = cdkObject?.objectExpression.range;
           context.report({
             node,
@@ -55,7 +55,7 @@ export default createRule<Options, MessageIds>({
               },
             ],
           });
-        } else if (cdkObject?.propertyValue === false) {
+        } else if (cdkObject && cdkObject.propertyValue === false) {
           context.report({
             node,
             messageId: 'requireSSL',
