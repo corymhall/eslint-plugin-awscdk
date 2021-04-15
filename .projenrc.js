@@ -23,6 +23,12 @@ const project = new TypeScriptAppProject({
     'eslint',
   ],
 
+  tsconfig: {
+    compilerOptions: {
+      esModuleInterop: true,
+    },
+  },
+
   /* NodePackageOptions */
   // allowLibraryDependencies: true,                                           /* Allow the project to include `peerDependencies` and `bundledDependencies`. */
   // authorEmail: undefined,                                                   /* Author's e-mail. */
