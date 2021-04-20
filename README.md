@@ -97,7 +97,20 @@ new Table(this, 'Table', {
 
 - [EC2.3 Attached EBS volumes should be encrypted at-rest](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ec2-3)
 
+*How to enable*
+```ts
+new ec2.Volume(this, 'Volume', {
+  encrypted: true,
+});
+```
+
 - [EFS.1 Amazon EFS should be configured to encrypt file data at rest using AWS KMS](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-efs-1)
+
+```ts
+new efs.FileSystem(this, 'FileSystem', {
+  encrypted: true,
+});
+```
 
 - [ELB.4 Application load balancers should be configured to drop HTTP headers](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-elb-4)
 
@@ -136,13 +149,62 @@ new ApplicationLoadBalancer(this, 'ALB', {
 
 - [ELBv2.1 Application Load Balancer should be configured to redirect all HTTP requests to HTTPS](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-elbv2-1)
 
+*How to enable*
+
+```ts
+const alb = new elbv2.ApplicationLoadBalancer(this, 'ALB');
+
+alb.addListener('1', {
+  protocol: elbv2.ApplicationProtocol.HTTP, // applies to listeners with HTTP protocol
+  port: 80, //  if protocol is not provided then will default to http if port is 80 | 8080 | 8000 | 8008
+  defaultAction: elbv2.ListenerAction.redirect({
+    protocol: elbv2.ApplicationProtocol.HTTPS,
+    ...
+  }),
+});
+
+// or
+
+new elbv2.ApplicationListener(this, 'Listener', {
+  protocol: elbv2.ApplicationProtocol.HTTP, // applies to listeners with HTTP protocol
+  port: 80, //  if protocol is not provided then will default to http if port is 80 | 8080 | 8000 | 8008
+  defaultAction: elbv2.ListenerAction.redirect({
+    protocol: elbv2.ApplicationProtocol.HTTPS,
+    ...
+  }),
+})
+```
+
 - [EMR.1 Amazon EMR cluster master nodes should not have public IP addresses](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-emr-1)
 
 - [ES.1 Elasticsearch domains should have encryption at-rest enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-es-1)
 
+*How to enable*
+```ts
+new elasticsearch.Domain(this, 'Domain', {
+  encryptionAtRest: {
+    enabled: true,
+  }
+});
+```
+
 - [ES.2 Amazon Elasticsearch Service domains should be in a VPC](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-es-2)
 
+*How to enable*
+```ts
+new elasticsearch.Domain(this, 'Domain', {
+  vpc,
+});
+```
+
 - [ES.3 Amazon Elasticsearch Service domains should encrypt data sent between nodes](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-es-3)
+
+*How to enable*
+```ts
+new elasticsearch.Domain(this, 'Domain', {
+  nodeToNodeEncryption: true,
+});
+```
 
 - [IAM.1 IAM policies should not allow full "*" administrative privileges](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-iam-1)
 
@@ -156,8 +218,22 @@ new iam.PolicyStatement({
 
 - [IAM.2 IAM users should not have IAM policies attached](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-iam-2)
 
+*Will fail rule*
+```ts
+const user = new iam.User(this, 'User', {
+  managedPolicies: [...] // will fail if this is provided.
+});
+
+user.addManagedPolicy();
+user.addToPolicy();
+user.addToPrincipalPolicy();
+user.attachInlinePolicy();
+```
+
+
 - [KMS.1 IAM customer managed policies should not allow decryption actions on all KMS keys](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-kms-1)
 
+*Will fail rule*
 ```ts
 import * as iam from '@aws-cdk/aws-iam';
 new iam.PolicyStatement({
@@ -169,6 +245,7 @@ new iam.PolicyStatement({
 
 - [KMS.2 IAM principals should not have IAM inline policies that allow decryption actions on all KMS keys](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-kms-2)
 
+*Will fail rule*
 ```ts
 import * as iam from '@aws-cdk/aws-iam';
 new iam.PolicyStatement({
@@ -180,15 +257,88 @@ new iam.PolicyStatement({
 
 - [KMS.3 AWS KMS keys should not be unintentionally deleted](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-kms-3)
 
+*Will fail rule*
 ```ts
 new kms.Key(this, 'Key', {
   removalPolicy: cdk.RemovalPolicy.DESTROY,
-})
+});
 ```
 
 - [Lambda.1 Lambda function policies should prohibit public access](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-lambda-1)
 
+```ts
+// any policy with `iam.AnyPrincipal() can't be attached to a Lambda function
+const policy = new iam.PolicyStatment({
+  principals: [ 
+    new iam.AnyPrincipal() // equals {"AWS": "*"}
+  ],
+  ...
+});
+
+// Lots of ways to attach this permission to a lambda function...
+
+// used in `initialPolicy`
+const handler = new lambda.Function(this, 'Handler', {
+  initialPolicy: [policy],
+  ...
+});
+
+// or
+handler.grantPrincipal.addToPrincipalPolicy(policy);
+
+//or
+handler.role?.addToPrincipalPolicy(policy);
+
+//or
+handler.role?.attachInlinePolicy(policy);
+
+//or
+handler.role?.grant(new iam.AnyPrincipal(), [...]);
+
+//or
+handler.role?.grantPassRole(new iam.AnyPrincipal());
+
+//or
+handler.role?.grantPrincipal.addToPrincipalPolicy(policy);
+
+//or
+handler.addPermission('permission', {
+  principal: new iam.AnyPrincipal(),
+  ...
+});
+
+//or
+handler.addToRolePolicy(policy);
+
+//or
+handler.grantInvoke(new iam.AnyPrincipal());
+```
+
 - [Lambda.2 Lambda functions should use latest runtimes](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-lambda-2)
+
+*How to enable*
+```ts
+new lambda.Function(this, 'Handler', {
+  runtime: Runtime.PYTHON_3_8, 
+});
+```
+
+Will check for these runtimes:
+
+- `PYTHON_3_8`
+- `PYTHON_3_7`
+- `PYTHON_3_6`
+- `NODEJS_10_X`
+- `NODEJS_12_X`
+- `NODEJS_14_X`
+- `RUBY_2_5`
+- `RUBY_2_7`
+- `JAVA_11`
+- `GO_1_X`
+- `JAVA_8`
+- `DOTNET_CORE_2_1`
+- `DOTNET_CORE_3_1`
+
 
 - [RDS.2 RDS DB instances should prohibit public access, determined by the PubliclyAccessible configuration](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-rds-2)
 
@@ -218,9 +368,15 @@ new rds.DatabaseInstance(this, 'Instance', {
 })
 ```
 
-- [RDS.4 RDS cluster snapshots and database snapshots should be encrypted at rest](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-rds-4)
-
 - [RDS.5 RDS DB instances should be configured with multiple Availability Zones](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-rds-5)
+
+*How to enable*
+```ts
+new rds.DatabaseInstance(this, 'DB', {
+  multiAz: true,
+  ...
+});
+```
 
 - [RDS.6 Enhanced monitoring should be configured for RDS DB instances and clusters](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-rds-6)
 
@@ -229,7 +385,13 @@ new rds.DatabaseInstance(this, 'Instance', {
 new rds.DatabaseInstance(this, 'Instance', {
   ...
   enablePerformanceInsights: true,
-})
+});
+
+// or
+new rds.DatabaseInstance(this, 'Instance', {
+  ...
+  enablePerformanceInsights: true,
+});
 ```
 
 *or*
@@ -302,7 +464,86 @@ new rds.DatabaseInstance(this, 'Instance', {
 
 - [RDS.9 Database logging should be enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-rds-9)
 
+*How to enable*
+__also applies to XXFromSnapshot & XXReadReplica__
+```ts
+// log exports depend on the engine used
+new rds.DatabaseCluster(this, 'Cluster', {
+  cloudwatchLogsExports: []
+  ...
+});
+
+// for AURORA_POSTGRESQL
+new rds.DatabaseCluster(this, 'Cluster', {
+  engine: rds.DatabaseClusterEngine.AURORA_POSTGRESQL,
+  cloudwatchLogsExports: ['Postgresql', 'Upgrade'],
+  ...
+});
+
+// for AURORA_MYSQL & AURORA
+new rds.DatabaseCluster(this, 'Cluster', {
+  engine: rds.DatabaseClusterEngine.AURORA_MYSQL,
+  cloudwatchLogsExports: ['Audit', 'Error', 'General', 'SlowQuery'],
+  ...
+});
+
+// for MySQL
+new rds.DatabaseInstance(this, 'RDS', {
+  engine: rds.DatabaseInstanceEngine.MYSQL,
+  cloudwatchLogsExports: ['Audit', 'Error', 'General', 'SlowQuery'],
+});
+
+// for POSTGRES
+new rds.DatabaseInstance(this, 'RDS', {
+  engine: rds.DatabaseInstanceEngine.POSTGRESQL,
+  cloudwatchLogsExports: ['Postgresql', 'Upgrade'],
+  ...
+});
+
+// for ORACLE_EE, ORACLE_SE, ORACLE_SE1, ORACLE_SE2
+new rds.DatabaseInstance(this, 'RDS', {
+  engine: rds.DatabaseInstanceEngine.ORACLE_XX,
+  cloudwatchLogsExports: ['Alert', 'Audit', 'Trace', 'Listener'],
+  ...
+});
+
+// for SQL_SERVER_EE, SQL_SERVER_EX, SQL_SERVER_SE, SQL_SERVER_SE, SQL_SERVER_WEB
+new rds.DatabaseInstance(this, 'RDS', {
+  engine: rds.DatabaseInstanceEngine.SQL_SERVER_XX,
+  cloudwatchLogsExports: ['Error', 'Agent'],
+  ...
+});
+
+// for MARIADB
+new rds.DatabaseInstance(this, 'RDS', {
+  engine: rds.DatabaseInstanceEngine.MARIADB,
+  cloudwatchLogsExports: ['Audit', 'Error', 'General', 'SlowQuery'],
+  ...
+});
+
+```
+
 - [RDS.10 IAM authentication should be configured for RDS instances](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-rds-10)
+
+*How to enable*
+```ts
+new rds.DatabaseInstance(this, 'RDS', {
+  iamAuthentication: true,
+  ...
+});
+
+// or
+new rds.DatabaseInstanceFromSnapshot(this, 'RDS', {
+  iamAuthentication: true,
+  ...
+});
+
+// or
+new rds.DatabaseInstanceReadReplica(this, 'RDS', {
+  iamAuthentication: true,
+  ...
+});
+```
 
 - [Redshift.1 Amazon Redshift clusters should prohibit public access](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-1)
 
