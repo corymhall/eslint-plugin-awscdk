@@ -1,12 +1,35 @@
-# replace this
 
 
 ## AWS Foundational Security Best Practices
 
-[APIGateway.1 API Gateway REST and HTTP API logging should be enabled]()
+- [APIGateway.1 API Gateway REST and Websocket API logging should be enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-apigateway-1)
 
-```typescript
+*How to enable*
+```ts
+new apigateway.Stage(this, 'Stage', {
+  loggingLevel: apigateway.MethodLoggingLevel.ERROR, // or INFO
+  ...
+});
 
+// or
+
+new apigateway.RestApi(this, 'API', {
+  deployOptions: {
+    loggingLevel: apigateway.MethodLoggingLevel.ERROR, // or INFO
+  },
+  ...
+})
+```
+
+- [AutoScaling.1 Auto Scaling groups associated with a load balancer should use load balancer health checks](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-autoscaling-1)
+
+*How to enable*
+```ts
+// if autoScalingGroupName is provided then it should use ELB health checks
+new autoscaling.AutoScalingGroup(this, 'ASG', {
+  autoScalingGroupName: 'my-asg',
+  healthCheck: autoscaling.HealthCheck.elb(),
+});
 ```
 
 - [CloudFront.1 CloudFront distributions should have a default root object configured](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-cloudfront-1)
@@ -58,6 +81,8 @@ new Distribution(this, 'Distribution', {
 
 - [DMS.1 Database Migration Service replication instances should not be public](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dms-1)
 
+__Currently no L2 construct__
+
 - [DynamoDB.1 DynamoDB tables should automatically scale capacity with demand](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-1)
 
 *How to enable*
@@ -94,6 +119,8 @@ new Table(this, 'Table', {
 ```
 
 - [DynamoDB.3 DynamoDB Accelerator (DAX) clusters should be encrypted at rest](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-dynamodb-3)
+
+__Currently no L2 construct__
 
 - [EC2.3 Attached EBS volumes should be encrypted at-rest](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-ec2-3)
 
@@ -176,6 +203,8 @@ new elbv2.ApplicationListener(this, 'Listener', {
 ```
 
 - [EMR.1 Amazon EMR cluster master nodes should not have public IP addresses](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-emr-1)
+
+__Currently no L2 construct__
 
 - [ES.1 Elasticsearch domains should have encryption at-rest enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-es-1)
 
@@ -547,17 +576,81 @@ new rds.DatabaseInstanceReadReplica(this, 'RDS', {
 
 - [Redshift.1 Amazon Redshift clusters should prohibit public access](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-1)
 
+*Will fail rule*
+```ts
+new redshift.Cluster(this, 'Cluster', {
+  publiclyAccessible:  true,
+});
+```
+
 - [Redshift.2 Connections to Amazon Redshift clusters should be encrypted in transit](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-2)
+
+*How to enable*
+
+```ts
+const parameterGroup = new redshift.ClusterParameterGroup(this, 'ParamGroup', {
+  parameters: {
+    require_SSL: '1',
+  },
+});
+
+new redshift.Cluster(this, 'Cluster', {
+  parameterGroup,
+});
+```
 
 - [Redshift.3 Amazon Redshift clusters should have automatic snapshots enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-3)
 
+Currently default to `1` without the ability to change. [issue link](https://github.com/aws/aws-cdk/issues/9224)
+
 - [Redshift.6 Amazon Redshift should have automatic upgrades to major versions enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-redshift-6)
+
+This is automatically enabled when using the [Redshift Cluster L2 Construct](https://docs.aws.amazon.com/cdk/api/latest/docs/@aws-cdk_aws-redshift.Cluster.html)
 
 - [S3.1 S3 Block Public Access setting should be enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-s3-1)
 
+*How to enable*
+```ts
+new s3.Bucket(this, 'Bucket', {
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+});
+
+// or
+
+new s3.Bucket(this, 'Bucket', {
+  blockPublicAccess: new s3.BlockPublicAccess({
+    blockPublicAcls: true,
+    blockPublicPolicy: true,
+    ignorePublicAcls: true,
+    restrictPublicBuckets: true,
+  }),
+});
+```
+
 - [S3.2 S3 buckets should prohibit public read access](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-s3-2)
 
+*Through Block Public Access settings*
+__How to enable__
+```ts
+new s3.Bucket(this, 'Bucket', {
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+});
+
+// or
+
+new s3.Bucket(this, 'Bucket', {
+  blockPublicAccess: new s3.BlockPublicAccess({
+    blockPublicAcls: true,
+    blockPublicPolicy: true,
+    ignorePublicAcls: true,
+    restrictPublicBuckets: true,
+  }),
+});
+```
+
+
 *Through Bucket ACL*
+__Will fail rule__
 ```ts
 new s3.Bucket(this, 'Bucket', {
   accessControl: s3.BucketAccessControl.PUBLIC_READ,
@@ -575,22 +668,110 @@ const bucket = new s3.Bucket(this, 'Bucket', {
   accessControl: s3.BucketAccessControl.AUTHENTICATED_READ,
 });
 
-
-
 b.grantReadAccess()
 bucket.grantReadAccess();
+
+// or
+
+new s3.Bucket(this, 'Bucket', {
+  publicReadAccess: true,
+});
+```
+
+*Through Bucket policy*
+```ts
+const bucket = new s3.Bucket(this, 'Bucket');
+
+bucket.grantPublicAccess();
+
+// or
+bucket.addToResourcePolicy(new iam.PolicyStatement({
+  ...,
+  principals: ['*'],
+}));
+
+// or
+const bucketPolicy = new s3.BucketPolicy(this, 'BucketPolicy', {
+  bucket,
+});
+
+bucketPolicy.document.addStatements([
+  new iam.PolicyStatement({
+    ...,
+    principals: ['*'],
+  }),
+]);
 ```
 
 - [S3.3 S3 buckets should prohibit public write access](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-s3-3)
 
+*Through Block Public Access settings*
+__How to enable__
+```ts
+new s3.Bucket(this, 'Bucket', {
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+});
+
+// or
+
+new s3.Bucket(this, 'Bucket', {
+  blockPublicAccess: new s3.BlockPublicAccess({
+    blockPublicAcls: true,
+    blockPublicPolicy: true,
+    ignorePublicAcls: true,
+    restrictPublicBuckets: true,
+  }),
+});
+```
+
 *Through Bucket ACL*
+__Will fail rule__
 ```ts
 new s3.Bucket(this, 'Bucket', {
   accessControl: s3.BucketAccessControl.PUBLIC_READ_WRITE,
 });
 ```
 
+*Through Bucket policy*
+__Will fail rule__
+```ts
+const bucket = new s3.Bucket(this, 'Bucket');
+
+bucket.grantPublicAccess();
+
+// or
+bucket.addToResourcePolicy(new iam.PolicyStatement({
+  ...,
+  principals: ['*'],
+}));
+
+// or
+const bucketPolicy = new s3.BucketPolicy(this, 'BucketPolicy', {
+  bucket,
+});
+
+bucketPolicy.document.addStatements([
+  new iam.PolicyStatement({
+    ...,
+    principals: ['*'],
+  }),
+]);
+```
+
 - [S3.4 S3 buckets should have server-side encryption enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-s3-4)
+
+*How to enable*
+```ts
+new s3.Bucket(this, 'Bucket', {
+  encryption: s3.BucketEncryption.XXX // any value
+});
+
+// or
+
+new s3.Bucket(this, 'Bucket', {
+  encryptionKey,
+});
+```
 
 - [S3.5 S3 buckets should require requests to use Secure Socket Layer](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-s3-5)
 
@@ -603,13 +784,52 @@ new s3.Bucket(this, 'Bucket', {
 
 - [S3.6 Amazon S3 permissions granted to other AWS accounts in bucket policies should be restricted](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-s3-6)
 
+*Will fail rule*
+```ts
+const policy = new iam.PolicyStatement({
+  actions: [ // these actions are not allowed
+    's3:DeleteBucketPolicy',
+    's3:PutBucketAcl',
+    's3:PutBucketPolicy',
+    's3:PutEncryptionConfiguration',
+    's3:PutObjectAcl',
+  ],
+  principals: [
+    new iam.AccountPrincipal('11111111111'), // If granting access to current account should use iam.AccountRootPrincipal()
+    new iam.AnyPrincipal(), // allows access from any AWS account, i.e. { "AWS": "*" }
+  ],
+  ...
+})
+```
+
 - [SageMaker.1 SageMaker notebook instances should not have direct internet access](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-sagemaker-1)
+
+__Currently no L2__
 
 - [SecretsManager.1 Secrets Manager secrets should have automatic rotation enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-secretsmanager-1)
 
+*How to enable*
+```ts
+const secret = new secretsmanager.Secret(this, 'Secret');
+secret.addRotationSchedule();
+
+// or
+
+const secret = new secretsmanager.Secret(this, 'Secret');
+new secretsmanager.RotationSchedule(this, 'Rotation', {
+  secret,
+})
+```
+
 - [SNS.1 SNS topics should be encrypted at rest using AWS KMS](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-sns-1)
 
-- 
+*How to enable*
+```ts
+new sns.Topic(this, 'Topic', {
+  masterKey,
+  ...
+})
+```
 
 ## CIS AWS Foundations Benchmark
 
