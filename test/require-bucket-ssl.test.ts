@@ -20,7 +20,7 @@ import * as s3 from 'monocdk/aws-s3';
 
 new s3.Bucket(this, 'StorageBucket', {
   encryption: s3.BucketEncryption.KMS_MANAGED,
-  requireSSL: true,
+  enforceSSL: true,
 });
 `,
     },
@@ -33,22 +33,22 @@ import * as s3 from 'monocdk/aws-s3';
 
 new s3.Bucket(this, 'StorageBucket', {
   encryption: s3.BucketEncryption.KMS_MANAGED,
-  requireSSL: false,
+  enforceSSL: false,
 });
 `,
       errors: [
         {
-          messageId: 'requireSSL',
+          messageId: 'enforceSSL',
           suggestions: [
             {
-              messageId: 'requireSSL',
+              messageId: 'enforceSSL',
               output: `
 import * as cdk from 'monocdk';
 import * as s3 from 'monocdk/aws-s3';
 
 new s3.Bucket(this, 'StorageBucket', {
   encryption: s3.BucketEncryption.KMS_MANAGED,
-  requireSSL: true,
+  enforceSSL: true,
 });
 `,
             },
@@ -67,17 +67,17 @@ new s3.Bucket(this, 'StorageBucket', {
 `,
       errors: [
         {
-          messageId: 'requireSSL',
+          messageId: 'enforceSSL',
           suggestions: [
             {
-              messageId: 'requireSSL',
+              messageId: 'enforceSSL',
               output: `
 import * as cdk from 'monocdk';
 import * as s3 from 'monocdk/aws-s3';
 
 new s3.Bucket(this, 'StorageBucket', {
   encryption: s3.BucketEncryption.KMS_MANAGED,
-  requireSSL: true,
+  enforceSSL: true,
 });
 `,
             },
@@ -95,7 +95,7 @@ new s3.Bucket(this, 'StorageBucket');
 `,
       errors: [
         {
-          messageId: 'requireSSL',
+          messageId: 'enforceSSL',
         },
       ],
       output: null,

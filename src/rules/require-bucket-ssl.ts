@@ -7,14 +7,14 @@ const createRule = ESLintUtils.RuleCreator(
 
 type Options = [];
 type MessageIds =
-    | 'requireSSL'
+    | 'enforceSSL'
 
 export default createRule<Options, MessageIds>({
   meta: {
     type: 'suggestion',
     schema: [],
     messages: {
-      requireSSL: 'S3 buckets should require requests to use Secure Socket Layer',
+      enforceSSL: 'S3 buckets should require requests to use Secure Socket Layer',
     },
     docs: {
       category: 'Best Practices',
@@ -35,19 +35,19 @@ export default createRule<Options, MessageIds>({
           construct: 'Bucket',
           library: 's3',
           node: node,
-          propertyKey: 'requireSSL',
+          propertyKey: 'enforceSSL',
         });
         if (cdkObject && cdkObject.propertyValue === undefined) {
           objectRange = cdkObject?.objectExpression.range;
           context.report({
             node,
-            messageId: 'requireSSL',
+            messageId: 'enforceSSL',
             suggest: [
               {
-                messageId: 'requireSSL',
+                messageId: 'enforceSSL',
                 fix: (fixer: TSESLint.RuleFixer) => {
                   const fixes: TSESLint.RuleFix[] = [
-                    fixer.insertTextBeforeRange([objectRange[1]-1, objectRange[1]], `${spaces}requireSSL: true,\n`),
+                    fixer.insertTextBeforeRange([objectRange[1]-1, objectRange[1]], `${spaces}enforceSSL: true,\n`),
                   ];
                   return fixes;
                 },
@@ -58,11 +58,11 @@ export default createRule<Options, MessageIds>({
         } else if (cdkObject && cdkObject.propertyValue === false) {
           context.report({
             node,
-            messageId: 'requireSSL',
+            messageId: 'enforceSSL',
             loc: cdkObject.propertyLoc,
             suggest: [
               {
-                messageId: 'requireSSL',
+                messageId: 'enforceSSL',
                 fix: (fixer: TSESLint.RuleFixer) => {
                   const fixes: TSESLint.RuleFix[] = [
                     fixer.replaceTextRange(cdkObject.propertyRange!, 'true'),
