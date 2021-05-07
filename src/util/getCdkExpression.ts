@@ -66,6 +66,13 @@ export function getCdkExpression(
                   propertyLoc: pr.value.loc,
                   propertyRange: pr.value.range,
                 };
+              case AST_NODE_TYPES.ObjectExpression:
+                return {
+                  objectExpression: a,
+                  propertyValue: pr.value.properties,
+                  propertyLoc: pr.value.loc,
+                  propertyRange: pr.value.range,
+                };
             }
           }
         }
