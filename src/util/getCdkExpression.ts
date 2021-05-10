@@ -35,6 +35,7 @@ export function getCdkExpression(
         hasObjectExpression = true;
         for (let p = 0; p < a.properties.length; p++) {
           let pr = a.properties[p] as TSESTree.Property;
+          console.log('pr', pr);
           if (pr.key.type === AST_NODE_TYPES.Identifier && pr.key.name === params.propertyKey) {
             switch (pr.value.type) {
               case AST_NODE_TYPES.MemberExpression:
@@ -70,6 +71,13 @@ export function getCdkExpression(
                 return {
                   objectExpression: a,
                   propertyValue: pr.value.properties,
+                  propertyLoc: pr.value.loc,
+                  propertyRange: pr.value.range,
+                };
+              case AST_NODE_TYPES.NewExpression:
+                return {
+                  objectExpression: a,
+                  propertyValue: pr.value,
                   propertyLoc: pr.value.loc,
                   propertyRange: pr.value.range,
                 };
