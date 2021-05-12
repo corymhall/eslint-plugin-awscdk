@@ -13,9 +13,10 @@ interface findVariableProps {
   variableIdentifier: string;
   memberExpression: TSESTree.MemberExpression;
 }
-export function findVariable(props: findVariableProps): boolean {
+export function findVariable(props: findVariableProps): TSESTree.NewExpression[] {
   const imports: Import[] = [];
   let found = false;
+  const variableDeclaration: TSESTree.NewExpression[] = [];
 
   props.scope.references.forEach(reference => {
     const variable = reference.resolved;
@@ -45,13 +46,33 @@ export function findVariable(props: findVariableProps): boolean {
               return false;
             });
             if (foundImport != undefined) {
+              variableDeclaration.push(parentv.init);
               found = true;
             }
+          } else if (parentv.init?.type === AST_NODE_TYPES.ArrayExpression) {
+            parentv.init.elements.forEach(ele => {
+              if (ele.type === AST_NODE_TYPES.NewExpression) {
+                const foundImport = imports.find(( i: Import ) => {
+                  if (i.name === props.library) {
+                    switch (i.library) {
+                      case `monocdk/aws-${props.library}`:
+                      case `@aws-cdk/aws-${props.library}`:
+                        return true;
+                    }
+                  }
+                  return false;
+                });
+                if (foundImport != undefined) {
+                  variableDeclaration.push(ele);
+                  found = true;
+                }
+              }
+            });
           }
         }
         return found;
       });
     }
   });
-  return found;
+  return variableDeclaration;
 }

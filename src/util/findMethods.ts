@@ -5,18 +5,22 @@ interface findMethodsProps {
   node?: TSESTree.Program;
   variableName: string;
 }
-export function findMethods(props: findMethodsProps): string[] {
-  let methods: string[] = [];
+export function findMethods(props: findMethodsProps): {[name: string]: TSESTree.Node} {
+  let methods: {[name: string]: TSESTree.Node} = {};
 
   // if the method is called from a variable, i.e.
   //     const table = new dynamodb.Table(...);
   //     table.autoScaleReadCapacity();
   // then it will be in the scope references.
   props.scope?.references.forEach(reference => {
+    // console.log('firstreference', reference);
     if (reference.identifier.type === AST_NODE_TYPES.Identifier && reference.identifier.name === props.variableName) {
       if (reference.identifier?.parent?.type === AST_NODE_TYPES.MemberExpression) {
+        // console.log('referenceparent', reference.identifier.parent);
         if (reference.identifier.parent.property.type === AST_NODE_TYPES.Identifier) {
-          methods.push(reference.identifier.parent.property.name);
+          // console.log('reference', reference.identifier.parent.parent);
+          // methods.push(reference.identifier.parent.property.name);
+          methods[reference.identifier.parent.property.name] = reference.identifier.parent;
         }
       }
     }
@@ -50,7 +54,10 @@ export function findMethods(props: findMethodsProps): string[] {
                         bbb.expression.callee.object.property.name === props.variableName) &&
                         bbb.expression.callee.property.type === AST_NODE_TYPES.Identifier
                   ) {
-                    methods.push(bbb.expression.callee.property.name);
+                    // console.log('bbb', bbb.expression.callee);
+                    // methods.push(bbb.expression.callee.property.name);
+                    // methods.push(bbb.expression.callee);
+                    methods[bbb.expression.callee.property.name] = bbb.expression.callee;
                   }
                 }
               }

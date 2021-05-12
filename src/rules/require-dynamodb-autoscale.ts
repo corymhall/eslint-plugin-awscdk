@@ -35,7 +35,7 @@ export default createRule<Options, MessageIds>({
         node,
       });
       if (found) {
-        var methods: string[] = [];
+        var methods: {[name: string]: TSESTree.Node} = {};
         const scope = context.getScope();
         var variableName: string = '';
         switch (node.parent?.type) {
@@ -65,7 +65,7 @@ export default createRule<Options, MessageIds>({
         }
 
         if (variableName != '') {
-          if (!methods.includes('autoScaleReadCapacity') || !methods.includes('autoScaleWriteCapacity')) {
+          if (!('autoScaleReadCapacity' in methods) || !('autoScaleWriteCapacity' in methods)) {
             return false;
           }
         } else {

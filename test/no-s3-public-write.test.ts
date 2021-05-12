@@ -24,20 +24,20 @@ new s3.Bucket(this, 'TestBucket', {
 });
 `,
     },
-    {
-      code: `
-import * as s3 from '@aws-cdk/aws-s3';
+    //{
+    //code: `
+    //import * as s3 from '@aws-cdk/aws-s3';
 
-new s3.Bucket(this, 'TestBucket', {
-  blockPublicAccess: new s3.BlockPublicAccess({
-    blockPublicAcls: true,
-    blockPublicPolicy: true,
-    ignorePublicAcls: true,
-    restrictPublicBuckets: true,
-  }),
-});
-`,
-    },
+    //new s3.Bucket(this, 'TestBucket', {
+  //blockPublicAccess: new s3.BlockPublicAccess({
+    //blockPublicAcls: true,
+    //blockPublicPolicy: true,
+    //ignorePublicAcls: true,
+    //restrictPublicBuckets: true,
+  //}),
+    //});
+    //`,
+    //},
   ],
   invalid: [
     {
@@ -50,10 +50,10 @@ new s3.Bucket(this, 'TestBucket', {
 `,
       errors: [
         {
-          messageId: 'publicBucket',
+          messageId: 'noS3PublicWrite',
           suggestions: [
             {
-              messageId: 'bucketShouldBePrivate',
+              messageId: 'bucketACLAllowsPublicWrite',
               output: `
 import * as s3 from '@aws-cdk/aws-s3';
 
@@ -81,23 +81,23 @@ new s3.Bucket(this, 'TestBucket', {
 `,
       errors: [
         {
-          messageId: 'publicBucket',
+          messageId: 'noS3PublicWrite',
           // suggestions: [
-            // {
-              // messageId: 'bucketShouldBePrivate',
-              // output: `
-// import * as s3 from '@aws-cdk/aws-s3';
+          // {
+          // messageId: 'bucketShouldBePrivate',
+          // output: `
+          // import * as s3 from '@aws-cdk/aws-s3';
 
-// new s3.Bucket(this, 'TestBucket', {
-  // blockPublicAccess: new s3.BlockPublicAccess({
-    // blockPublicAcls: true,
-    // blockPublicPolicy: true,
-    // ignorePublicAcls: true,
-    // restrictPublicBuckets: true,
-  // }),
-// });
-// `,
-            // },
+          // new s3.Bucket(this, 'TestBucket', {
+          // blockPublicAccess: new s3.BlockPublicAccess({
+          // blockPublicAcls: true,
+          // blockPublicPolicy: true,
+          // ignorePublicAcls: true,
+          // restrictPublicBuckets: true,
+          // }),
+          // });
+          // `,
+          // },
           // ],
         },
       ],
@@ -113,10 +113,10 @@ new s3.Bucket(this, 'TestBucket', {
 `,
       errors: [
         {
-          messageId: 'publicBucket',
+          messageId: 'noS3PublicWrite',
           suggestions: [
             {
-              messageId: 'bucketShouldBePrivate',
+              messageId: 'bucketAllowsPublicWrite',
               output: `
 import * as s3 from '@aws-cdk/aws-s3';
 
@@ -140,14 +140,16 @@ bucket.grantPublicAccess();
 `,
       errors: [
         {
-          messageId: 'publicBucket',
+          messageId: 'noS3PublicWrite',
           suggestions: [
             {
-              messageId: 'bucketShouldBePrivate',
+              messageId: 'bucketAllowsPublicWrite',
               output: `
 import * as s3 from '@aws-cdk/aws-s3';
 
 const bucket = new s3.Bucket(this, 'TestBucket');
+
+
 `,
             },
           ],
@@ -158,18 +160,19 @@ const bucket = new s3.Bucket(this, 'TestBucket');
     {
       code: `
 import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
 
 const bucket = new s3.Bucket(this, 'TestBucket');
 
 bucket.addToResourcePolicy(new iam.PolicyStatement({
     actions: ['s3:GetObject'],
     resources: ['*'],
-    pricinpals: ['*'],
+    principals: ['*'],
 }));
 `,
       errors: [
         {
-          messageId: 'publicBucket',
+          messageId: 'noS3PublicWrite',
         },
       ],
       output: null,
@@ -177,6 +180,29 @@ bucket.addToResourcePolicy(new iam.PolicyStatement({
     {
       code: `
 import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
+
+const bucket = new s3.Bucket(this, 'TestBucket');
+
+const policy = new iam.PolicyStatement({
+    actions: ['s3:GetObject'],
+    resources: ['*'],
+    principals: ['*'],
+});
+
+bucket.addToResourcePolicy(policy);
+`,
+      errors: [
+        {
+          messageId: 'noS3PublicWrite',
+        },
+      ],
+      output: null,
+    },
+    {
+      code: `
+import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
 
 const bucket = new s3.Bucket(this, 'TestBucket');
 
@@ -188,13 +214,149 @@ bucketPolicy.document.addStatements([
   new iam.PolicyStatement({
     actions: ['s3:GetObject'],
     resources: ['*'],
-    pricinpals: ['*'],
+    principals: ['*'],
   })
 ]);
 `,
       errors: [
         {
-          messageId: 'publicBucket',
+          messageId: 'noS3PublicWrite',
+        },
+      ],
+      output: null,
+    },
+    {
+      code: `
+import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
+
+const bucket = new s3.Bucket(this, 'TestBucket');
+
+bucket.addToResourcePolicy(new iam.PolicyStatement({
+    actions: ['s3:GetObject'],
+    resources: ['*'],
+    principals: ['myPrincipal'],
+}));
+
+bucket.addToResourcePolicy(new iam.PolicyStatement({
+    actions: ['s3:GetObject'],
+    resources: ['*'],
+    principals: ['*'],
+}));
+`,
+      errors: [
+        {
+          messageId: 'noS3PublicWrite',
+        },
+      ],
+      output: null,
+    },
+    {
+      code: `
+import * as cdk from '@aws-cdk/core';
+import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
+
+export class NewBucket extends cdk.Stack {
+  public readonly bucket: s3.IBucket;
+  constructor(scope: cdk.Construct, id: string, props: cdk.StackProps) {
+    super(scope, id, props);
+    this.bucket = new s3.Bucket(this, 'TestBucket');
+
+    this.bucket.addToResourcePolicy(new iam.PolicyStatement({
+        actions: ['s3:GetObject'],
+        resources: ['*'],
+        principals: ['myPrincipal'],
+    }));
+
+    this.bucket.addToResourcePolicy(new iam.PolicyStatement({
+        actions: ['s3:GetObject'],
+        resources: ['*'],
+        principals: ['*'],
+    }));
+  }
+}
+
+`,
+      errors: [
+        {
+          messageId: 'noS3PublicWrite',
+        },
+      ],
+      output: null,
+    },
+    {
+      code: `
+import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
+
+const bucket = new s3.Bucket(this, 'TestBucket');
+
+const policy = new iam.PolicyStatement({
+    actions: ['s3:GetObject'],
+    resources: ['*'],
+    principals: ['*'],
+});
+
+bucket.addToResourcePolicy(policy);
+`,
+      errors: [
+        {
+          messageId: 'noS3PublicWrite',
+        },
+      ],
+      output: null,
+    },
+    {
+      code: `
+import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
+
+const bucket = new s3.Bucket(this, 'TestBucket');
+
+const bucketPolicy = new s3.BucketPolicy(this, 'BucketPolicy', {
+    bucket,
+});
+
+
+const statements = [new iam.PolicyStatement({
+  actions: ['s3:GetObject'],
+  resources: ['*'],
+  principals: ['*'],
+})];
+
+bucketPolicy.document.addStatements(statements)
+`,
+      errors: [
+        {
+          messageId: 'noS3PublicWrite',
+        },
+      ],
+      output: null,
+    },
+    {
+      code: `
+import * as s3 from '@aws-cdk/aws-s3';
+import * as iam from '@aws-cdk/aws-iam';
+
+const bucket = new s3.Bucket(this, 'TestBucket');
+
+const bucketPolicy = new s3.BucketPolicy(this, 'BucketPolicy', {
+    bucket,
+});
+
+
+const statement = new iam.PolicyStatement({
+  actions: ['s3:GetObject'],
+  resources: ['*'],
+  principals: ['*'],
+});
+
+bucketPolicy.document.addStatements([ statement ])
+`,
+      errors: [
+        {
+          messageId: 'noS3PublicWrite',
         },
       ],
       output: null,
