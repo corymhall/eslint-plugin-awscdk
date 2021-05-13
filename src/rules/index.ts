@@ -4,6 +4,7 @@ import noKmsKeyDelete from './no-kms-key-delete';
 import noPolicyAllowKmsDecrypt from './no-policy-allow-kms-decrypt';
 import noPublicIngress from './no-public-ingress';
 import noRdsPublicAccess from './no-rds-public-access';
+import noRedshiftPublicAccess from './no-redshift-public-access';
 import noS3PublicRead from './no-s3-public-read';
 import noS3PublicWrite from './no-s3-public-write';
 import requireBucketEncryption from './require-bucket-encryption';
@@ -30,4 +31,5 @@ export default {
   'no-s3-public-write': noS3PublicWrite,
   'no-s3-public-read': noS3PublicRead,
   'require-cloudfront-default-root-object': requireCloudFrontDefaultRootObject,
+  'no-redshift-public-access': noRedshiftPublicAccess,
 };

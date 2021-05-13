@@ -11,5 +11,6 @@ export = {
     'cdk-security/no-s3-public-write': 'error',
     'cdk-security/no-s3-public-read': 'error',
     'cdk-security/require-cloudfront-default-root-object': 'error',
+    'cdk-security/no-redshift-public-access': 'error',
   },
 };
