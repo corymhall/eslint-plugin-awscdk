@@ -9,5 +9,6 @@ export = {
     'cdk-security/no-rds-public-access': 'error',
     'cdk-security/no-kms-key-delete': 'error',
     'cdk-security/no-s3-public-write': 'error',
+    'cdk-security/no-s3-public-read': 'error',
   },
 };
