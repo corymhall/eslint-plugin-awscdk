@@ -10,5 +10,6 @@ export = {
     'cdk-security/no-kms-key-delete': 'error',
     'cdk-security/no-s3-public-write': 'error',
     'cdk-security/no-s3-public-read': 'error',
+    'cdk-security/require-cloudfront-default-root-object': 'error',
   },
 };
