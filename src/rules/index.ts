@@ -4,6 +4,7 @@ import noKmsKeyDelete from './no-kms-key-delete';
 import noPolicyAllowKmsDecrypt from './no-policy-allow-kms-decrypt';
 import noPublicIngress from './no-public-ingress';
 import noRdsPublicAccess from './no-rds-public-access';
+import noS3PublicWrite from './no-s3-public-write';
 import requireBucketEncryption from './require-bucket-encryption';
 import requireBucketPrivate from './require-bucket-private';
 import requireBucketSSL from './require-bucket-ssl';
@@ -24,4 +25,5 @@ export default {
   'require-dynamodb-autoscale': requireDynamoDBAutoScaling,
   'no-rds-public-access': noRdsPublicAccess,
   'no-kms-key-delete': noKmsKeyDelete,
+  'no-s3-public-write': noS3PublicWrite,
 };
