@@ -9,20 +9,8 @@
       "type": "build"
     },
     {
-      "name": "@types/jest",
-      "type": "build"
-    },
-    {
       "name": "@types/node",
-      "type": "build"
-    },
-    {
-      "name": "@types/node",
-      "version": "^10.17.0",
-      "type": "build"
-    },
-    {
-      "name": "@typescript-eslint/eslint-plugin",
+      "version": "^14.17.0",
       "type": "build"
     },
     {
@@ -54,10 +42,6 @@
       "type": "build"
     },
     {
-      "name": "jest",
-      "type": "build"
-    },
-    {
       "name": "jest-junit",
       "version": "^12",
       "type": "build"
@@ -67,13 +51,12 @@
       "type": "build"
     },
     {
-      "name": "projen",
-      "version": "^0.17.17",
+      "name": "npm-check-updates",
+      "version": "^11",
       "type": "build"
     },
     {
-      "name": "standard-version",
-      "version": "^9",
+      "name": "projen",
       "type": "build"
     },
     {
@@ -81,7 +64,8 @@
       "type": "build"
     },
     {
-      "name": "typescript",
+      "name": "ts-node",
+      "version": "^9",
       "type": "build"
     },
     {

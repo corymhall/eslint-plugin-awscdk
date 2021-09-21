@@ -1,6 +1,104 @@
+# ESLint Plugin for AWS CDK
 
+<!--BEGIN STABILITY BANNER-->
 
-## AWS Foundational Security Best Practices
+---
+
+![cdk: Experimental](https://img.shields.io/badge/cdk--constructs-experimental-important.svg?style=for-the-badge)
+
+> This module is experimental and under active development.
+> Features are subject to non-backward compatible changes or removal in any future version. These are
+> not subject to the [Semantic Versioning](https://semver.org/) model and breaking changes will be
+> announced in the release notes. This means that while you may use them, you may need to update
+> your source code when upgrading to a newer version of this package.
+
+---
+
+<!--END STABILITY BANNER-->
+
+## How to use
+
+### Install
+
+```bash
+npm install --save-dev eslint-plugin-awscdk
+```
+
+### Configure
+
+#### Using ESLint configs
+
+_Using [projen](https://github.com/projen/projen)_
+```js
+import { AwsCdkTypeScriptApp } from 'projen';
+const project = new AwsCdkTypeScriptApp({
+  ...
+
+  devDeps: [
+    'eslint-plugin-awscdk',
+  ],
+
+  ...
+});
+project.eslint?.config.plugins.push('awscdk');
+project.eslint?.config.extends.push('plugin:awscdk/all'); // or 'awscdk/aws-foundational' etc
+```
+
+_without projen_
+_update eslintrc.json_
+```json
+{
+	"plugins": [
+		"awscdk"
+	],
+	"extends": [
+		"plugin:awscdk/all"
+	]
+}
+```
+
+#### Using ESLint rules
+
+_using projen_
+```js
+import { AwsCdkTypeScriptApp } from 'projen';
+const project = new AwsCdkTypeScriptApp({
+  ...
+
+  devDeps: [
+    'eslint-plugin-awscdk',
+  ],
+
+  ...
+});
+project.eslint?.config.plugins.push('awscdk');
+
+// add individual rules
+project.eslint?.addRules({
+  'awscdk/require-bucket-encryption': [
+    2, // can set severity (0 = info, 1 = warning, 2 = error)
+  ],
+});
+```
+
+_without projen_
+_update eslintrc.json_
+```json
+{
+	"plugins": [
+		"awscdk"
+	],
+	"rules": {
+		"awscdk/require-bucket-encryption": [
+			2
+		]
+	}
+}
+```
+
+### Rules
+
+#### AWS Foundational Security Best Practices
 
 - [APIGateway.1 API Gateway REST and Websocket API logging should be enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-standards-fsbp-controls.html#fsbp-apigateway-1)
 
@@ -830,58 +928,3 @@ new sns.Topic(this, 'Topic', {
   ...
 })
 ```
-
-## CIS AWS Foundations Benchmark
-
-- [Ensure rotation for customer-created CMKs is enabled](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-2.8)
-
-```typescript
-import * as kms from '@aws-cdk/aws-kms';
-
-new kms.Key(this, 'MyKey', {
-    enableKeyRotation: true
-});
-```
-
-- [Ensure VPC flow logging is enabled in all VPCs](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-2.9)
-
-```ts
-import * as ec2 from '@aws-cdk/aws-ec2';
-
-new ec2.Vpc(this, 'Vpc', {
-    flowLogs: {
-        'my-vpc-flowlog': {
-            destination: ec2.FlowLogDestination.toCloudWatchLogs(),
-            trafficType: ec2.FlowLogTrafficType.REJECT,
-        }
-    }
-});
-```
-
-or 
-
-```ts
-import * as ec2 from '@aws-cdk/aws-ec2';
-
-const vpc = new ec2.Vpc(this, 'Vpc', {
-    flowLogs: {
-        'my-vpc-flowlog': {
-            destination: ec2.FlowLogDestination.toCloudWatchLogs(),
-            trafficType: ec2.FlowLogTrafficType.REJECT,
-        }
-    }
-});
-
-vpc.addFlowLog('my-vpc-flowlog', {
-    destination: ec2.FlowLogDestination.toCloudWatchLogs(),
-    trafficType: ec2.FlowLogTrafficType.REJECT,
-});
-```
-
-- [Ensure no security groups allow ingress from 0.0.0.0/0 to port 22](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-4.1)
-
-- [Ensure no security groups allow ingress from 0.0.0.0/0 to port 3389](https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-cis-controls.html#securityhub-cis-controls-4.2)
-
-
-
-## 
