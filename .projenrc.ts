@@ -7,9 +7,9 @@ const project = new TypeScriptAppProject({
   repository: 'https://github.com/corymhall/eslint-plugin-awscdk',
 
   stale: false,
-
   package: true,
-
+  release: true,
+  releaseToNpm: true,
   entrypoint: 'lib/index.js',
 
   autoApproveUpgrades: true,

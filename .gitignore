@@ -34,6 +34,8 @@ jspm_packages/
 junit.xml
 /coverage/
 !/.github/workflows/build.yml
+/dist/changelog.md
+/dist/version.txt
 !/.mergify.yml
 !/.github/workflows/upgrade.yml
 !/.github/pull_request_template.md
@@ -45,3 +47,4 @@ junit.xml
 !/tsconfig.jest.json
 !/.eslintrc.json
 !/tsconfig.eslint.json
+!/.github/workflows/release.yml
