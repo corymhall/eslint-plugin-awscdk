@@ -1,4 +1,4 @@
-import { TypeScriptAppProject } from 'projen';
+import { DependenciesUpgradeMechanism, TypeScriptAppProject } from 'projen';
 
 const project = new TypeScriptAppProject({
   defaultReleaseBranch: 'main',
@@ -14,8 +14,17 @@ const project = new TypeScriptAppProject({
 
   autoApproveUpgrades: true,
   autoApproveOptions: {
+    allowedUsernames: ['corymhall'],
     secret: 'GITHUB_TOKEN',
   },
+
+  depsUpgrade: DependenciesUpgradeMechanism.githubWorkflow({
+    ignoreProjen: false,
+    workflowOptions: {
+      labels: ['auto-approve'],
+      secret: 'PROJEN_GITHUB_TOKEN',
+    },
+  }),
 
   devDeps: [
     '@types/eslint',
