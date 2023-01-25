@@ -16,6 +16,8 @@
 
 <!--END STABILITY BANNER-->
 
+![](./assets/eslint-demo.gif)
+
 ## How to use
 
 ### Install

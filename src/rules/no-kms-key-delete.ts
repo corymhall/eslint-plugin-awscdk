@@ -1,5 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/experimental-utils';
-import { Rule } from 'eslint';
+import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -20,11 +19,12 @@ export default createRule<Options, MessageIds>({
       kmsKeyDoNotDelete: 'KMS Keys should not be scheduled for deletion',
     },
     docs: {
-      category: 'Best Practices',
+      suggestion: true,
       description: 'KMS Keys should not be scheduled for deletion',
       recommended: 'warn',
     },
     fixable: 'code',
+    hasSuggestions: true,
   },
   name: 'no-kms-key-delete',
   defaultOptions: [],
@@ -46,7 +46,7 @@ export default createRule<Options, MessageIds>({
               {
                 messageId: 'kmsKeyDoNotDelete',
                 fix: (fixer: TSESLint.RuleFixer) => {
-                  const fixes: Rule.Fix[] = [
+                  const fixes: TSESLint.RuleFix[] = [
                     fixer.replaceTextRange(cdkObject.propertyRange!, 'RETAIN'),
                   ];
                   return fixes;

@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESTree, AST_NODE_TYPES } from '@typescript-eslint/utils';
 // import { Rule } from 'eslint';
 // import * as util from '../util';
 
@@ -25,7 +25,6 @@ export default createRule<Options, MessageIds>({
     },
     docs: {
       requiresTypeChecking: true,
-      category: 'Best Practices',
       description: 'Security Group rules should not allow access from anywhere',
       recommended: 'warn',
       extendsBaseRule: false,

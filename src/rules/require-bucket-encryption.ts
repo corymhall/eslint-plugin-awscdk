@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESTree, TSESLint, AST_NODE_TYPES } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -19,18 +19,20 @@ export default createRule<Options, MessageIds>({
       enableKmsManagedEncryption: 'Enable KMS_MANAGED encryption for this bucket',
     },
     docs: {
-      category: 'Best Practices',
+      suggestion: true,
       description: 'Encryption should be enabled for all S3 buckets',
       recommended: 'warn',
       extendsBaseRule: false,
     },
     fixable: 'code',
+    hasSuggestions: true,
   },
   name: 'require-bucket-encryption',
   defaultOptions: [],
   create: context => {
     return {
       NewExpression(node: TSESTree.NewExpression) {
+        const spaces = ' '.repeat(util.findLocation(node) + 2);
         let objectRange: TSESTree.Range;
         const cdkObject = util.getCdkExpression({
           construct: 'Bucket',
@@ -55,7 +57,7 @@ export default createRule<Options, MessageIds>({
                   messageId: 'enableKmsManagedEncryption',
                   fix: (fixer: TSESLint.RuleFixer) => {
                     const fixes: TSESLint.RuleFix[] = [
-                      fixer.insertTextAfterRange([objectRange[0], objectRange[0] + 6], 'encryption: s3.BucketEncryption.KMS_MANAGED,\n    '),
+                      fixer.insertTextAfterRange([objectRange[0], objectRange[0]+2], `${spaces}encryption: s3.BucketEncryption.KMS_MANAGED,\n`),
                     ];
                     return fixes;
                   },

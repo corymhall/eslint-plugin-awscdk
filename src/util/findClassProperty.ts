@@ -1,4 +1,4 @@
-import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/experimental-utils';
+import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils';
 interface findClassProperty {
   node: TSESTree.Program;
   constructs: string[];
@@ -11,7 +11,7 @@ export function findClassProperty(props: findClassProperty) {
   props.node.body.forEach(b => {
     if (b.type === AST_NODE_TYPES.ExportNamedDeclaration && b.declaration?.type === AST_NODE_TYPES.ClassDeclaration) {
       b.declaration.body.body.forEach(bb => {
-        if (bb.type === AST_NODE_TYPES.ClassProperty) {
+        if (bb.type === AST_NODE_TYPES.PropertyDefinition) {
           if (bb.typeAnnotation?.typeAnnotation.type === AST_NODE_TYPES.TSTypeReference) {
             switch (bb.typeAnnotation.typeAnnotation.typeName.type) {
               case AST_NODE_TYPES.Identifier:

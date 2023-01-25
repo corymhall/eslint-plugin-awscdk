@@ -1,4 +1,4 @@
-import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/experimental-utils';
+import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -17,7 +17,6 @@ export default createRule<Options, MessageIds>({
       requireDynamoDBAutoScaling: 'DynamoDB tables should automatically scale capacity with demand',
     },
     docs: {
-      category: 'Best Practices',
       description: `This control passes if the table uses either on-demand capacity mode or provisioned mode
       with auto scaling configured.\n
       Scaling capacity with demand avoids throttling exceptions, which helps to maintain availability of your applications.`,

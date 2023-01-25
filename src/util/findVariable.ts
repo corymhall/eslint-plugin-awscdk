@@ -1,4 +1,4 @@
-import { TSESTree, AST_NODE_TYPES, TSESLint } from '@typescript-eslint/experimental-utils';
+import { TSESTree, AST_NODE_TYPES, TSESLint } from '@typescript-eslint/utils';
 // import { findNewExpression } from './findNewExpression';
 
 interface Import {
@@ -51,7 +51,7 @@ export function findVariable(props: findVariableProps): TSESTree.NewExpression[]
             }
           } else if (parentv.init?.type === AST_NODE_TYPES.ArrayExpression) {
             parentv.init.elements.forEach(ele => {
-              if (ele.type === AST_NODE_TYPES.NewExpression) {
+              if (ele?.type === AST_NODE_TYPES.NewExpression) {
                 const foundImport = imports.find(( i: Import ) => {
                   if (i.name === props.library) {
                     switch (i.library) {
