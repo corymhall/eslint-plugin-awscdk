@@ -1,5 +1,46 @@
 {
   "tasks": {
+    "build": {
+      "name": "build",
+      "description": "Full release build",
+      "steps": [
+        {
+          "spawn": "default"
+        },
+        {
+          "spawn": "pre-compile"
+        },
+        {
+          "spawn": "compile"
+        },
+        {
+          "spawn": "post-compile"
+        },
+        {
+          "spawn": "test"
+        },
+        {
+          "spawn": "package"
+        }
+      ]
+    },
+    "bump": {
+      "name": "bump",
+      "description": "Bumps version based on latest git tag and generates a changelog entry",
+      "env": {
+        "OUTFILE": "package.json",
+        "CHANGELOG": "dist/changelog.md",
+        "BUMPFILE": "dist/version.txt",
+        "RELEASETAG": "dist/releasetag.txt",
+        "RELEASE_TAG_PREFIX": ""
+      },
+      "steps": [
+        {
+          "builtin": "release/bump-version"
+        }
+      ],
+      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
+    },
     "clobber": {
       "name": "clobber",
       "description": "hard resets to HEAD of origin and cleans the local repo",
@@ -41,12 +82,81 @@
         }
       ]
     },
-    "test:compile": {
-      "name": "test:compile",
-      "description": "compiles the test code",
+    "default": {
+      "name": "default",
+      "description": "Synthesize project files",
       "steps": [
         {
-          "exec": "tsc --noEmit --project tsconfig.jest.json"
+          "exec": "ts-node --project tsconfig.dev.json .projenrc.ts"
+        }
+      ]
+    },
+    "eject": {
+      "name": "eject",
+      "description": "Remove projen from the project",
+      "env": {
+        "PROJEN_EJECTING": "true"
+      },
+      "steps": [
+        {
+          "spawn": "default"
+        }
+      ]
+    },
+    "eslint": {
+      "name": "eslint",
+      "description": "Runs eslint against the codebase",
+      "steps": [
+        {
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools projenrc .projenrc.ts"
+        }
+      ]
+    },
+    "package": {
+      "name": "package",
+      "description": "Creates the distribution package",
+      "steps": [
+        {
+          "exec": "mkdir -p dist/js"
+        },
+        {
+          "exec": "mv $(npm pack) dist/js/"
+        }
+      ]
+    },
+    "post-compile": {
+      "name": "post-compile",
+      "description": "Runs after successful compilation"
+    },
+    "post-upgrade": {
+      "name": "post-upgrade",
+      "description": "Runs after upgrading dependencies"
+    },
+    "pre-compile": {
+      "name": "pre-compile",
+      "description": "Prepare the project for compilation"
+    },
+    "release": {
+      "name": "release",
+      "description": "Prepare a release from \"main\" branch",
+      "env": {
+        "RELEASE": "true"
+      },
+      "steps": [
+        {
+          "exec": "rm -fr dist"
+        },
+        {
+          "spawn": "bump"
+        },
+        {
+          "spawn": "build"
+        },
+        {
+          "spawn": "unbump"
+        },
+        {
+          "exec": "git diff --ignore-space-at-eol --exit-code"
         }
       ]
     },
@@ -55,34 +165,11 @@
       "description": "Run tests",
       "steps": [
         {
-          "exec": "rm -fr lib/"
-        },
-        {
-          "spawn": "test:compile"
-        },
-        {
-          "exec": "jest --passWithNoTests --all --updateSnapshot"
+          "exec": "jest --passWithNoTests --updateSnapshot",
+          "receiveArgs": true
         },
         {
           "spawn": "eslint"
-        }
-      ]
-    },
-    "build": {
-      "name": "build",
-      "description": "Full release build (test+compile)",
-      "steps": [
-        {
-          "exec": "npx projen"
-        },
-        {
-          "spawn": "test"
-        },
-        {
-          "spawn": "compile"
-        },
-        {
-          "spawn": "package"
         }
       ]
     },
@@ -95,31 +182,6 @@
         }
       ]
     },
-    "test:update": {
-      "name": "test:update",
-      "description": "Update jest snapshots",
-      "steps": [
-        {
-          "exec": "jest --updateSnapshot"
-        }
-      ]
-    },
-    "bump": {
-      "name": "bump",
-      "description": "Bumps version based on latest git tag and generates a changelog entry",
-      "env": {
-        "OUTFILE": "package.json",
-        "CHANGELOG": "dist/changelog.md",
-        "BUMPFILE": "dist/version.txt",
-        "RELEASETAG": "dist/releasetag.txt"
-      },
-      "steps": [
-        {
-          "builtin": "release/bump-version"
-        }
-      ],
-      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
-    },
     "unbump": {
       "name": "unbump",
       "description": "Restores version to 0.0.0",
@@ -127,41 +189,12 @@
         "OUTFILE": "package.json",
         "CHANGELOG": "dist/changelog.md",
         "BUMPFILE": "dist/version.txt",
-        "RELEASETAG": "dist/releasetag.txt"
+        "RELEASETAG": "dist/releasetag.txt",
+        "RELEASE_TAG_PREFIX": ""
       },
       "steps": [
         {
           "builtin": "release/reset-version"
-        }
-      ]
-    },
-    "publish:github": {
-      "name": "publish:github",
-      "description": "Publish this package to GitHub Releases",
-      "requiredEnv": [
-        "GITHUB_TOKEN",
-        "GITHUB_REPOSITORY",
-        "GITHUB_REF"
-      ],
-      "steps": [
-        {
-          "exec": "errout=$(mktemp); gh release create $(cat dist/releasetag.txt) -R $GITHUB_REPOSITORY -F dist/changelog.md -t $(cat dist/releasetag.txt) --target $GITHUB_REF 2> $errout && true; exitcode=$?; if [ $exitcode -ne 0 ] && ! grep -q \"Release.tag_name already exists\" $errout; then cat $errout; exit $exitcode; fi"
-        }
-      ]
-    },
-    "publish:npm": {
-      "name": "publish:npm",
-      "description": "Publish this package to npm",
-      "env": {
-        "NPM_DIST_TAG": "latest",
-        "NPM_REGISTRY": "registry.npmjs.org"
-      },
-      "requiredEnv": [
-        "NPM_TOKEN"
-      ],
-      "steps": [
-        {
-          "exec": "npx -p jsii-release@latest jsii-release-npm"
         }
       ]
     },
@@ -172,6 +205,9 @@
         "CI": "0"
       },
       "steps": [
+        {
+          "exec": "yarn upgrade npm-check-updates"
+        },
         {
           "exec": "npm-check-updates --dep dev --upgrade --target=minor"
         },
@@ -195,6 +231,9 @@
         },
         {
           "exec": "npx projen"
+        },
+        {
+          "spawn": "post-upgrade"
         }
       ]
     },
@@ -204,62 +243,6 @@
       "steps": [
         {
           "exec": "tsc --build -w"
-        }
-      ]
-    },
-    "package": {
-      "name": "package",
-      "description": "Create an npm tarball",
-      "steps": [
-        {
-          "exec": "mkdir -p dist/js"
-        },
-        {
-          "exec": "yarn pack"
-        },
-        {
-          "exec": "mv *.tgz dist/js/"
-        }
-      ]
-    },
-    "eslint": {
-      "name": "eslint",
-      "description": "Runs eslint against the codebase",
-      "steps": [
-        {
-          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools .projenrc.js"
-        }
-      ]
-    },
-    "default": {
-      "name": "default",
-      "steps": [
-        {
-          "exec": "ts-node --skip-project .projenrc.ts"
-        }
-      ]
-    },
-    "release": {
-      "name": "release",
-      "description": "Prepare a release from \"main\" branch",
-      "env": {
-        "RELEASE": "true"
-      },
-      "steps": [
-        {
-          "exec": "rm -fr dist"
-        },
-        {
-          "spawn": "bump"
-        },
-        {
-          "spawn": "build"
-        },
-        {
-          "spawn": "unbump"
-        },
-        {
-          "exec": "git diff --ignore-space-at-eol --exit-code"
         }
       ]
     }

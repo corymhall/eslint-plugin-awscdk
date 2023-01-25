@@ -1,4 +1,4 @@
-import { TSESTree, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
+import { TSESTree, AST_NODE_TYPES } from '@typescript-eslint/utils';
 
 export function findImportNode(node: TSESTree.Node, constructName?: string, hasLibrary?: boolean, libraryName?: string): boolean {
   let root = false;
@@ -16,7 +16,10 @@ export function findImportNode(node: TSESTree.Node, constructName?: string, hasL
             let spec = body.specifiers[s] as TSESTree.ImportSpecifier;
             switch (body.source.value) {
               case 'monocdk':
+              case 'aws-cdk-lib':
+              case `aws-cdk-lib/aws-${libraryName}`:
               case `@aws-cdk/aws-${libraryName}`:
+              case `@aws-cdk/aws-${libraryName}-alpha`:
               case `monocdk/aws-${libraryName}`:
                 // e.g. import * as s3 from '@aws-cdk/aws-s3';
                 // e.g. import { aws_s3 as s3 } from 'monocdk';

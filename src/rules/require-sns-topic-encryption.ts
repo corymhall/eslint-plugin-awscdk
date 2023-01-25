@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -17,7 +17,6 @@ export default createRule<Options, MessageIds>({
       missingEncryption: 'Encryption should be enabled for all SNS Topic',
     },
     docs: {
-      category: 'Best Practices',
       description: 'SNS Topics should be encrypted at rest using AWS KMS',
       recommended: 'warn',
       extendsBaseRule: false,

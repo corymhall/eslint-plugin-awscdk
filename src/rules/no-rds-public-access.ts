@@ -1,5 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
-import { Rule } from 'eslint';
+import { ESLintUtils, TSESTree, TSESLint, AST_NODE_TYPES } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -24,11 +23,12 @@ export default createRule<Options, MessageIds>({
       rdsPrivateSubnets: 'Configure subnetType to use PRIVATE subnets',
     },
     docs: {
-      category: 'Best Practices',
+      suggestion: true,
       description: 'AWS RDS instances should not be publicly available',
       recommended: 'warn',
     },
     fixable: 'code',
+    hasSuggestions: true,
   },
   name: 'no-rds-public-access',
   defaultOptions: [],
@@ -61,7 +61,7 @@ export default createRule<Options, MessageIds>({
                       {
                         messageId: 'rdsPrivateSubnets',
                         fix: (fixer: TSESLint.RuleFixer) => {
-                          const fixes: Rule.Fix[] = [
+                          const fixes: TSESLint.RuleFix[] = [
                             fixer.replaceTextRange(range, 'PRIVATE'),
                           ];
                           return fixes;
@@ -71,7 +71,7 @@ export default createRule<Options, MessageIds>({
                       {
                         messageId: 'rdsIsolatedSubnets',
                         fix: (fixer: TSESLint.RuleFixer) => {
-                          const fixes: Rule.Fix[] = [
+                          const fixes: TSESLint.RuleFix[] = [
                             fixer.replaceTextRange(range, 'ISOLATED'),
                           ];
                           return fixes;
@@ -93,7 +93,7 @@ export default createRule<Options, MessageIds>({
                         {
                           messageId: 'rdsPrivateSubnets',
                           fix: (fixer: TSESLint.RuleFixer) => {
-                            const fixes: Rule.Fix[] = [
+                            const fixes: TSESLint.RuleFix[] = [
                               fixer.replaceTextRange(range, 'PRIVATE'),
                             ];
                             return fixes;
@@ -103,7 +103,7 @@ export default createRule<Options, MessageIds>({
                         {
                           messageId: 'rdsIsolatedSubnets',
                           fix: (fixer: TSESLint.RuleFixer) => {
-                            const fixes: Rule.Fix[] = [
+                            const fixes: TSESLint.RuleFix[] = [
                               fixer.replaceTextRange(range, 'ISOLATED'),
                             ];
                             return fixes;
@@ -127,7 +127,7 @@ export default createRule<Options, MessageIds>({
               {
                 messageId: 'noRDSPublicAccess',
                 fix: (fixer: TSESLint.RuleFixer) => {
-                  const fixes: Rule.Fix[] = [
+                  const fixes: TSESLint.RuleFix[] = [
                     fixer.replaceTextRange(cdkObject.propertyRange!, 'false'),
                   ];
                   return fixes;

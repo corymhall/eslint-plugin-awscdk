@@ -1,5 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
-import { Rule } from 'eslint';
+import { ESLintUtils, TSESTree, TSESLint, AST_NODE_TYPES } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -27,12 +26,13 @@ export default createRule<Options, MessageIds>({
     },
     docs: {
       requiresTypeChecking: true,
-      category: 'Best Practices',
+      suggestion: true,
       description: 'Buckets should not allow public write access',
       recommended: 'warn',
       extendsBaseRule: false,
     },
     fixable: 'code',
+    hasSuggestions: true,
   },
   name: 'no-s3-public-write',
   defaultOptions: [],
@@ -74,7 +74,7 @@ export default createRule<Options, MessageIds>({
             methods.document.parent.parent.arguments.forEach(arg => {
               if (arg.type === AST_NODE_TYPES.ArrayExpression) {
                 arg.elements.forEach(ele => {
-                  if (ele.type === AST_NODE_TYPES.NewExpression) {
+                  if (ele?.type === AST_NODE_TYPES.NewExpression) {
                     parsePrincipalsInPolicy(ele);
                   }
                 });
@@ -93,7 +93,7 @@ export default createRule<Options, MessageIds>({
               }
               if (arg.type === AST_NODE_TYPES.ArrayExpression) {
                 arg.elements.forEach(ele => {
-                  if (ele.type === AST_NODE_TYPES.Identifier) {
+                  if (ele?.type === AST_NODE_TYPES.Identifier) {
                     const found = util.findVariable({
                       construct: 'PolicyStatement',
                       library: 'iam',
@@ -131,7 +131,7 @@ export default createRule<Options, MessageIds>({
             {
               messageId: 'bucketAllowsPublicWrite',
               fix: (fixer: TSESLint.RuleFixer) => {
-                const fixes: Rule.Fix[] = [
+                const fixes: TSESLint.RuleFix[] = [
                   fixer.remove(methods.grantPublicAccess.parent!.parent!),
                 ];
                 return fixes;
@@ -192,7 +192,7 @@ export default createRule<Options, MessageIds>({
               {
                 messageId: 'bucketACLAllowsPublicWrite',
                 fix: (fixer: TSESLint.RuleFixer) => {
-                  const fixes: Rule.Fix[] = [
+                  const fixes: TSESLint.RuleFix[] = [
                     fixer.replaceTextRange(cdkObject.propertyRange!, 'PRIVATE'),
                   ];
                   return fixes;
@@ -244,7 +244,7 @@ export default createRule<Options, MessageIds>({
               {
                 messageId: 'bucketAllowsPublicWrite',
                 fix: (fixer: TSESLint.RuleFixer) => {
-                  const fixes: Rule.Fix[] = [
+                  const fixes: TSESLint.RuleFix[] = [
                     fixer.replaceTextRange(cdkObject2.propertyRange!, 'BLOCK_ALL'),
                   ];
                   return fixes;

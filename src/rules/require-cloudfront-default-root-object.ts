@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESTree } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -19,7 +19,6 @@ export default createRule<Options, MessageIds>({
       requireCloudFrontDefaultRootObject: 'CloudFront distributions should have defaultRootObject configured.',
     },
     docs: {
-      category: 'Best Practices',
       description: 'This control checks whether an Amazon CloudFront distribution is configured to return a specific object that is the default root object.',
       recommended: 'warn',
     },

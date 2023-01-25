@@ -1,5 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/experimental-utils';
-import { Rule } from 'eslint';
+import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -23,12 +22,13 @@ export default createRule<Options, MessageIds>({
     },
     docs: {
       requiresTypeChecking: true,
-      category: 'Best Practices',
+      suggestion: true,
       description: 'Buckets should not be public',
       recommended: 'warn',
       extendsBaseRule: false,
     },
     fixable: 'code',
+    hasSuggestions: true,
   },
   name: 'require-bucket-private',
   defaultOptions: [],
@@ -50,7 +50,7 @@ export default createRule<Options, MessageIds>({
               {
                 messageId: 'bucketShouldBePrivate',
                 fix: (fixer: TSESLint.RuleFixer) => {
-                  const fixes: Rule.Fix[] = [
+                  const fixes: TSESLint.RuleFix[] = [
                     fixer.replaceTextRange(cdkObject.propertyRange!, 'false'),
                   ];
                   return fixes;

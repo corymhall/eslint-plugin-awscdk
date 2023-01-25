@@ -1,5 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/experimental-utils';
-import { Rule } from 'eslint';
+import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -20,11 +19,12 @@ export default createRule<Options, MessageIds>({
       noRedshiftPublicAccess: 'AWS Redshift instances should not be publicly available',
     },
     docs: {
-      category: 'Best Practices',
+      suggestion: true,
       description: 'AWS Redshift instances should not be publicly available',
       recommended: 'warn',
     },
     fixable: 'code',
+    hasSuggestions: true,
   },
   name: 'no-redshift-public-access',
   defaultOptions: [],
@@ -46,7 +46,7 @@ export default createRule<Options, MessageIds>({
               {
                 messageId: 'noRedshiftPublicAccess',
                 fix: (fixer: TSESLint.RuleFixer) => {
-                  const fixes: Rule.Fix[] = [
+                  const fixes: TSESLint.RuleFix[] = [
                     fixer.replaceTextRange(cdkObject.propertyRange!, 'false'),
                   ];
                   return fixes;

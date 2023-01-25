@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { TSESLint } from '@typescript-eslint/experimental-utils';
+import { TSESLint } from '@typescript-eslint/utils';
 import rule from '../src/rules/require-cloudfront-default-root-object';
 
 // let linter: ESLint;

@@ -1,4 +1,4 @@
-import { TypeScriptAppProject } from 'projen';
+import { TypeScriptAppProject } from 'projen/lib/typescript';
 
 const project = new TypeScriptAppProject({
   defaultReleaseBranch: 'main',
@@ -19,10 +19,8 @@ const project = new TypeScriptAppProject({
   },
 
   depsUpgradeOptions: {
-    ignoreProjen: false,
     workflowOptions: {
       labels: ['auto-approve'],
-      secret: 'PROJEN_GITHUB_TOKEN',
     },
   },
 
@@ -36,7 +34,7 @@ const project = new TypeScriptAppProject({
   ],
 
   deps: [
-    '@typescript-eslint/experimental-utils',
+    '@typescript-eslint/utils',
     '@typescript-eslint/parser',
     'eslint',
   ],
@@ -48,4 +46,5 @@ const project = new TypeScriptAppProject({
   },
 });
 
+project.npmignore?.exclude('assets');
 project.synth();

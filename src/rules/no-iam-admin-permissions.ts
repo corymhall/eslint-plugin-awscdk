@@ -1,4 +1,4 @@
-import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/experimental-utils';
+import { AST_NODE_TYPES, ESLintUtils, TSESTree } from '@typescript-eslint/utils';
 // import { Rule } from 'eslint';
 import * as util from '../util';
 
@@ -21,7 +21,6 @@ export default createRule<Options, MessageIds>({
     },
     docs: {
       requiresTypeChecking: true,
-      category: 'Best Practices',
       description: 'Buckets should not be public',
       recommended: 'warn',
       extendsBaseRule: false,

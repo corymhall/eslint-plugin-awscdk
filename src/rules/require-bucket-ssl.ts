@@ -1,4 +1,4 @@
-import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -17,19 +17,20 @@ export default createRule<Options, MessageIds>({
       enforceSSL: 'S3 buckets should require requests to use Secure Socket Layer',
     },
     docs: {
-      category: 'Best Practices',
+      suggestion: true,
       description: 'This checks whether S3 buckets have policies that require requests to use Secure Socket Layer (SSL)',
       recommended: 'warn',
       extendsBaseRule: false,
     },
     fixable: 'code',
+    hasSuggestions: true,
   },
   name: 'require-bucket-ssl',
   defaultOptions: [],
   create: context => {
     return {
       NewExpression(node: TSESTree.NewExpression) {
-        const spaces = ' '.repeat(node.loc.start.column + 2);
+        const spaces = ' '.repeat(util.findLocation(node) + 2);
         let objectRange: TSESTree.Range;
         const cdkObject = util.getCdkExpression({
           construct: 'Bucket',
@@ -47,7 +48,7 @@ export default createRule<Options, MessageIds>({
                 messageId: 'enforceSSL',
                 fix: (fixer: TSESLint.RuleFixer) => {
                   const fixes: TSESLint.RuleFix[] = [
-                    fixer.insertTextBeforeRange([objectRange[1]-1, objectRange[1]], `${spaces}enforceSSL: true,\n`),
+                    fixer.insertTextAfterRange([objectRange[0], objectRange[0]+2], `${spaces}enforceSSL: true,\n`),
                   ];
                   return fixes;
                 },

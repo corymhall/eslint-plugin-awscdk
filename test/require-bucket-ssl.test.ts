@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { TSESLint } from '@typescript-eslint/experimental-utils';
+import { TSESLint } from '@typescript-eslint/utils';
 import rule from '../src/rules/require-bucket-ssl';
 
 // let linter: ESLint;
@@ -76,8 +76,8 @@ import * as cdk from 'monocdk';
 import * as s3 from 'monocdk/aws-s3';
 
 new s3.Bucket(this, 'StorageBucket', {
-  encryption: s3.BucketEncryption.KMS_MANAGED,
   enforceSSL: true,
+  encryption: s3.BucketEncryption.KMS_MANAGED,
 });
 `,
             },

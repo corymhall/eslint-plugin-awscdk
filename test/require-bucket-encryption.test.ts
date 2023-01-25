@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { TSESLint } from '@typescript-eslint/experimental-utils';
+import { TSESLint } from '@typescript-eslint/utils';
 import rule from '../src/rules/require-bucket-encryption';
 
 // let linter: ESLint;
@@ -50,11 +50,11 @@ export class Storage extends cdk.Construct {
 import * as s3 from '@aws-cdk/aws-s3';
 
 new s3.Bucket(this, 'TestBucket', {
-    encryption: s3.BucketEncryption.KMS_MANAGED,
-    removalPolicy: cdk.RemovalPolicy.DESTROY,
-    autoDeleteObjects: true,
-    blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-    bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
+  encryption: s3.BucketEncryption.KMS_MANAGED,
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+  bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
 });
 `,
     },
@@ -117,7 +117,7 @@ export class Storage extends cdk.Construct {
     super(scope, id);
 
     const bucket = new s3.Bucket(this, 'StorageBucket', {
-    encryption: s3.BucketEncryption.KMS_MANAGED,
+      encryption: s3.BucketEncryption.KMS_MANAGED,
       publicReadAccess: false,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
@@ -136,10 +136,10 @@ export class Storage extends cdk.Construct {
 import { aws_s3 as s3 } from 'monocdk/aws-s3';
 
 new s3.Bucket(this, 'TestBucket', {
-    removalPolicy: cdk.RemovalPolicy.DESTROY,
-    autoDeleteObjects: true,
-    blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-    bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+  bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
 });
 `,
       errors: [
@@ -152,11 +152,11 @@ new s3.Bucket(this, 'TestBucket', {
 import { aws_s3 as s3 } from 'monocdk/aws-s3';
 
 new s3.Bucket(this, 'TestBucket', {
-    encryption: s3.BucketEncryption.KMS_MANAGED,
-    removalPolicy: cdk.RemovalPolicy.DESTROY,
-    autoDeleteObjects: true,
-    blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-    bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
+  encryption: s3.BucketEncryption.KMS_MANAGED,
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+  bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
 });
 `,
             },
@@ -170,10 +170,10 @@ new s3.Bucket(this, 'TestBucket', {
 import { Bucket } from 'monocdk/aws-s3';
 
 new Bucket(this, 'TestBucket', {
-    removalPolicy: cdk.RemovalPolicy.DESTROY,
-    autoDeleteObjects: true,
-    blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-    bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+  bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
 });
 `,
       errors: [
@@ -186,11 +186,11 @@ new Bucket(this, 'TestBucket', {
 import { Bucket } from 'monocdk/aws-s3';
 
 new Bucket(this, 'TestBucket', {
-    encryption: s3.BucketEncryption.KMS_MANAGED,
-    removalPolicy: cdk.RemovalPolicy.DESTROY,
-    autoDeleteObjects: true,
-    blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-    bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
+  encryption: s3.BucketEncryption.KMS_MANAGED,
+  removalPolicy: cdk.RemovalPolicy.DESTROY,
+  autoDeleteObjects: true,
+  blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+  bucketName: cdk.PhysicalName.GENERATE_IF_NEEDED,
 });
 `,
             },

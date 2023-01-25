@@ -1,4 +1,4 @@
-import { TSESTree, AST_NODE_TYPES } from '@typescript-eslint/experimental-utils';
+import { TSESTree, AST_NODE_TYPES } from '@typescript-eslint/utils';
 import { findImportNode } from './findImportNode';
 
 interface findNewExpressionParams {

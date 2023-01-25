@@ -1,5 +1,4 @@
-
-import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/experimental-utils';
+import { ESLintUtils, TSESTree, TSESLint } from '@typescript-eslint/utils';
 import * as util from '../util';
 
 const createRule = ESLintUtils.RuleCreator(
@@ -18,11 +17,12 @@ export default createRule<Options, MessageIds>({
       missingPointInTimeRecovery: 'DynamoDB tables should have point-in-time recovery enabled',
     },
     docs: {
-      category: 'Best Practices',
+      suggestion: true,
       description: 'DynamoDB tables should have point-in-time recovery enabled.',
       recommended: 'warn',
       extendsBaseRule: false,
     },
+    hasSuggestions: true,
     fixable: 'code',
   },
   name: 'require-bucket-ptr',
