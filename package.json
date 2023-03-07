@@ -37,7 +37,7 @@
     "jest": "^27.5.1",
     "jest-junit": "^13",
     "npm-check-updates": "^16",
-    "projen": "^0.67.74",
+    "projen": "^0.67.75",
     "standard-version": "^9",
     "ts-jest": "^27.1.5",
     "ts-node": "^10",
@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@typescript-eslint/parser": "^4.33.0",
-    "@typescript-eslint/utils": "^5.54.0",
+    "@typescript-eslint/utils": "^5.54.1",
     "eslint": "^7.32.0"
   },
   "main": "lib/index.js",
